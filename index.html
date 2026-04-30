@@ -542,6 +542,7 @@ button.danger:hover {
   <input id="producto" placeholder="Nombre del producto">
   <input id="cantidad" type="number" value="1" min="1" placeholder="Cantidad">
   <input id="precio" type="number" placeholder="Precio unitario" step="0.01">
+  <input id="mesa" placeholder="Mesa 01">
 
   <label style="color: #000000; font-weight: 600; margin: 15px 0 8px 0; display: block; font-size: 14px;">Método de Pago</label>
   <select id="metodo">
@@ -717,10 +718,11 @@ window.guardar = async () => {
   const producto = document.getElementById("producto").value?.trim();
   const cantidad = parseFloat(document.getElementById("cantidad").value);
   const precio = parseFloat(document.getElementById("precio").value);
+  const mesa = document.getElementById("mesa").value?.trim();
   const metodo = document.getElementById("metodo").value;
   const nota = document.getElementById("nota").value?.trim();
 
-  console.log("Datos recibidos:", { producto, cantidad, precio, metodo, nota });
+  console.log("Datos recibidos:", { producto, cantidad, precio, mesa, metodo, nota });
 
   if (!producto) {
     mostrarError("El nombre del producto es obligatorio");
@@ -737,6 +739,11 @@ window.guardar = async () => {
     return;
   }
 
+  if (!mesa) {
+    mostrarError("Debes indicar la mesa, por ejemplo Mesa 01");
+    return;
+  }
+
   if (!auth.currentUser) {
     mostrarError("Debes estar logueado para registrar ventas");
     return;
@@ -749,6 +756,7 @@ window.guardar = async () => {
       producto,
       cantidad: parseFloat(cantidad),
       precio: parseFloat(precio),
+      mesa,
       metodo,
       nota: nota || "",
       total: parseFloat(cantidad) * parseFloat(precio),
@@ -764,6 +772,7 @@ window.guardar = async () => {
     document.getElementById("producto").value = "";
     document.getElementById("cantidad").value = "1";
     document.getElementById("precio").value = "";
+    document.getElementById("mesa").value = "";
     document.getElementById("nota").value = "";
 
     await cargar();
@@ -817,7 +826,7 @@ async function cargar() {
         <div class="item-card">
           <div class="item-info">
             <strong>${v.producto}</strong> x${v.cantidad}
-            <small>${v.metodo} • ${fecha}</small>
+            <small>${v.mesa ? `${v.mesa} • ` : ''}${v.metodo} • ${fecha}</small>
             ${v.nota ? `<br><small style="color: #95a5a6;">Nota: ${v.nota}</small>` : ''}
           </div>
           <div class="item-total">S/ ${v.total.toFixed(2)}</div>
