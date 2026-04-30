@@ -269,21 +269,42 @@ window.rapido = (nombre, precio) => {
 
 // GUARDAR
 window.guardar = async () => {
-  const producto = document.getElementById("producto").value;
+  const producto = document.getElementById("producto").value.trim();
   const cantidad = Number(document.getElementById("cantidad").value);
   const precio = Number(document.getElementById("precio").value);
   const metodo = document.getElementById("metodo").value;
 
-  await addDoc(collection(db, "ventas"), {
-    producto,
-    cantidad,
-    precio,
-    metodo,
-    total: cantidad * precio,
-    fecha: new Date().toISOString()
-  });
+  if (!producto || !cantidad || !precio) {
+    alert("❌ Completa todos los campos");
+    return;
+  }
 
-  cargar();
+  if (cantidad < 1 || precio < 0) {
+    alert("❌ Valores inválidos");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "ventas"), {
+      producto,
+      cantidad,
+      precio,
+      metodo,
+      total: cantidad * precio,
+      fecha: new Date().toISOString(),
+      usuario: auth.currentUser.email
+    });
+
+    alert("✅ Venta registrada correctamente");
+    document.getElementById("producto").value = "";
+    document.getElementById("cantidad").value = "1";
+    document.getElementById("precio").value = "";
+    
+    cargar();
+  } catch (error) {
+    console.error("Error:", error);
+    alert("❌ Error al registrar venta: " + error.message);
+  }
 };
 
 // LISTA
@@ -293,22 +314,27 @@ async function cargar() {
 
   let total = 0;
 
-  const data = await getDocs(collection(db, "ventas"));
+  try {
+    const data = await getDocs(collection(db, "ventas"));
 
-  data.forEach(d => {
-    const v = d.data();
-    total += v.total;
+    data.forEach(d => {
+      const v = d.data();
+      total += v.total;
 
-    lista.innerHTML += `
-      <div class="card">
-        ${v.producto} x${v.cantidad} - S/ ${v.total}
-        <br>${v.metodo}
-        <button onclick="eliminar('${d.id}')">❌</button>
-      </div>
-    `;
-  });
+      lista.innerHTML += `
+        <div class="card">
+          <strong>${v.producto}</strong> x${v.cantidad} - S/ ${(v.total).toFixed(2)}
+          <br><small>${v.metodo} - ${new Date(v.fecha).toLocaleString('es-PE')}</small>
+          <button onclick="eliminar('${d.id}')" style="margin-top: 8px; background: #d32f2f; padding: 8px;">❌ Eliminar</button>
+        </div>
+      `;
+    });
+  } catch (error) {
+    console.error("Error al cargar ventas:", error);
+    lista.innerHTML = '<p style="color: #d32f2f;">Error al cargar las ventas</p>';
+  }
 
-  document.getElementById("total").innerText = total;
+  document.getElementById("total").innerText = total.toFixed(2);
 }
 
 // ELIMINAR
