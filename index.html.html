@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEOPARDO'S PRO</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0f0f0f;
+  color: white;
+}
+
+.container {
+  padding: 15px;
+}
+
+.card {
+  background: #1c1c1c;
+  padding: 12px;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+}
+
+input, select {
+  background: #2a2a2a;
+  color: white;
+}
+
+button {
+  background: gold;
+  font-weight: bold;
+}
+
+h2 {
+  text-align: center;
+}
+
+/* POS botones rápidos */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.btn-producto {
+  padding: 15px;
+  background: #333;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="loginDiv">
+  <h2>🔐 Login</h2>
+  <input id="email" placeholder="Correo">
+  <input id="password" type="password" placeholder="Contraseña">
+  <button onclick="login()">Entrar</button>
+</div>
+
+<div class="container" id="appDiv" style="display:none">
+
+<h2>🐆 LEOPARDO'S</h2>
+
+<!-- BOTONES RÁPIDOS -->
+<div class="grid">
+  <div class="btn-producto" onclick="rapido('Hamburguesa',15)">🍔 Hamburguesa</div>
+  <div class="btn-producto" onclick="rapido('Gaseosa',5)">🥤 Gaseosa</div>
+  <div class="btn-producto" onclick="rapido('Papas',8)">🍟 Papas</div>
+  <div class="btn-producto" onclick="rapido('Hot Dog',10)">🌭 Hot Dog</div>
+</div>
+
+<!-- FORM -->
+<div class="card">
+  <input id="producto" placeholder="Producto">
+  <input id="cantidad" type="number" value="1">
+  <input id="precio" type="number" placeholder="Precio">
+
+  <select id="metodo">
+    <option>Efectivo</option>
+    <option>Yape</option>
+    <option>Plin</option>
+  </select>
+
+  <button onclick="guardar()">💰 Registrar</button>
+</div>
+
+<h3>Ventas</h3>
+<div id="lista"></div>
+
+<h2>Total: S/ <span id="total">0</span></h2>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs, deleteDoc, doc
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+// 🔥 PEGA TU CONFIG
+const firebaseConfig = {
+  apiKey: "TU_API",
+  authDomain: "TU_DOMINIO",
+  projectId: "TU_PROJECT_ID",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// LOGIN
+window.login = async () => {
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
+
+  await signInWithEmailAndPassword(auth, email, pass);
+};
+
+// CONTROL DE SESIÓN
+onAuthStateChanged(auth, user => {
+  if (user) {
+    document.getElementById("loginDiv").style.display = "none";
+    document.getElementById("appDiv").style.display = "block";
+    cargar();
+  }
+});
+
+// BOTONES RÁPIDOS
+window.rapido = (nombre, precio) => {
+  document.getElementById("producto").value = nombre;
+  document.getElementById("precio").value = precio;
+  document.getElementById("cantidad").value = 1;
+};
+
+// GUARDAR
+window.guardar = async () => {
+  const producto = document.getElementById("producto").value;
+  const cantidad = Number(document.getElementById("cantidad").value);
+  const precio = Number(document.getElementById("precio").value);
+  const metodo = document.getElementById("metodo").value;
+
+  await addDoc(collection(db, "ventas"), {
+    producto,
+    cantidad,
+    precio,
+    metodo,
+    total: cantidad * precio,
+    fecha: new Date().toISOString()
+  });
+
+  cargar();
+};
+
+// LISTA
+async function cargar() {
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  let total = 0;
+
+  const data = await getDocs(collection(db, "ventas"));
+
+  data.forEach(d => {
+    const v = d.data();
+    total += v.total;
+
+    lista.innerHTML += `
+      <div class="card">
+        ${v.producto} x${v.cantidad} - S/ ${v.total}
+        <br>${v.metodo}
+        <button onclick="eliminar('${d.id}')">❌</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("total").innerText = total;
+}
+
+// ELIMINAR
+window.eliminar = async (id) => {
+  await deleteDoc(doc(db, "ventas", id));
+  cargar();
+};
+
+</script>
+
+</body>
+</html>
