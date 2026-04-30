@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LEOPARDO'S PRO</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0f0f0f">
 
 <style>
 body {
@@ -108,6 +111,7 @@ h2 {
 <div class="container" id="appDiv" style="display:none">
 
 <button class="logout-btn" onclick="logout()">🔒 Salir</button>
+<button id="installBtn" class="logout-btn" style="right: auto; left: 15px; display: none; background: #333;">⬇️ Instalar App</button>
 
 <h2>🐆 LEOPARDO'S</h2>
 <p style="text-align: center; color: #aaa; font-size: 14px;">Usuario: <strong id="userEmail"></strong></p>
@@ -373,7 +377,36 @@ window.eliminar = async (id) => {
   await deleteDoc(doc(db, "ventas", id));
   cargar();
 };
+let deferredInstallPrompt = null;
+window.installApp = async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  const choiceResult = await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  document.getElementById('installBtn').style.display = 'none';
+  console.log('PWA install choice:', choiceResult.outcome);
+};
 
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  const installButton = document.getElementById('installBtn');
+  if (installButton) {
+    installButton.style.display = 'block';
+    installButton.onclick = window.installApp;
+  }
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      await navigator.serviceWorker.register('service-worker.js');
+      console.log('Service worker registered');
+    } catch (error) {
+      console.error('Service worker registration failed:', error);
+    }
+  });
+}
 </script>
 
 </body>
