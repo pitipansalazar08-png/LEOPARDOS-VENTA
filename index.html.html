@@ -61,6 +61,25 @@ h2 {
   text-align: center;
   cursor: pointer;
 }
+
+.logout-btn {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  padding: 10px 15px;
+  background: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  z-index: 1000;
+}
+
+.logout-btn:hover {
+  background: #b71c1c;
+}
 </style>
 </head>
 
@@ -68,14 +87,30 @@ h2 {
 
 <div class="container" id="loginDiv">
   <h2>🔐 Login</h2>
-  <input id="email" placeholder="Correo">
+  <input id="email" placeholder="Correo" type="email">
   <input id="password" type="password" placeholder="Contraseña">
   <button onclick="login()">Entrar</button>
+  <div id="loginError" style="color: #d32f2f; margin-top: 10px; text-align: center;"></div>
+  <p style="text-align: center; color: #aaa; margin-top: 20px;">¿No tienes cuenta? <a href="#" onclick="mostrarRegistro()" style="color: gold;">Regístrate aquí</a></p>
+</div>
+
+<div class="container" id="registerDiv" style="display:none">
+  <h2>📝 Registrarse</h2>
+  <input id="regName" placeholder="Nombre completo">
+  <input id="regEmail" placeholder="Correo" type="email">
+  <input id="regPassword" type="password" placeholder="Contraseña">
+  <input id="regPasswordConfirm" type="password" placeholder="Confirmar contraseña">
+  <button onclick="register()">Crear Cuenta</button>
+  <div id="regError" style="color: #d32f2f; margin-top: 10px; text-align: center;"></div>
+  <p style="text-align: center; color: #aaa; margin-top: 20px;">¿Ya tienes cuenta? <a href="#" onclick="mostrarLogin()" style="color: gold;">Inicia sesión</a></p>
 </div>
 
 <div class="container" id="appDiv" style="display:none">
 
+<button class="logout-btn" onclick="logout()">🔒 Salir</button>
+
 <h2>🐆 LEOPARDO'S</h2>
+<p style="text-align: center; color: #aaa; font-size: 14px;">Usuario: <strong id="userEmail"></strong></p>
 
 <!-- BOTONES RÁPIDOS -->
 <div class="grid">
@@ -107,7 +142,7 @@ h2 {
 
 </div>
 
-<script type="module" <script type="module">
+<script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
@@ -115,27 +150,19 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 import {
-  getAuth, signInWithEmailAndPassword, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"; const firebaseConfig = {
-  apiKey: "AIzaSyD...",
-  authDomain: "leopardos-5b93c.firebaseapp.com",
-  projectId: "leopardos-5b93c"
-};>
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import {
-  getFirestore, collection, addDoc, getDocs, deleteDoc, doc
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-import {
-  getAuth, signInWithEmailAndPassword, onAuthStateChanged
+  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-// 🔥 PEGA TU CONFIG
+// 🔥 CONFIGURACIÓN DE FIREBASE
 const firebaseConfig = {
-  apiKey: "TU_API",
-  authDomain: "TU_DOMINIO",
-  projectId: "TU_PROJECT_ID",
+  apiKey: "AIzaSyD_7HEBDtSJDPTcdi4vP9ZjUoyI0gmaU0U",
+  authDomain: "leopardos-5b93c.firebaseapp.com",
+  databaseURL: "https://leopardos-5b93c-default-rtdb.firebaseio.com",
+  projectId: "leopardos-5b93c",
+  storageBucket: "leopardos-5b93c.firebasestorage.app",
+  messagingSenderId: "979653813637",
+  appId: "1:979653813637:web:262acd0e067fb4af6f50ec",
+  measurementId: "G-F54CTRVXLT"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -144,18 +171,92 @@ const auth = getAuth(app);
 
 // LOGIN
 window.login = async () => {
-  const email = document.getElementById("email").value;
+  const email = document.getElementById("email").value.trim();
   const pass = document.getElementById("password").value;
 
-  await signInWithEmailAndPassword(auth, email, pass);
+  if (!email || !pass) {
+    document.getElementById("loginError").innerText = "❌ Completa todos los campos";
+    return;
+  }
+
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    document.getElementById("loginError").innerText = "";
+  } catch (error) {
+    console.error("Error:", error);
+    let mensaje = "❌ Correo o contraseña incorrectos";
+    if (error.code === "auth/user-not-found") mensaje = "❌ El correo no está registrado";
+    if (error.code === "auth/wrong-password") mensaje = "❌ Contraseña incorrecta";
+    if (error.code === "auth/invalid-email") mensaje = "❌ Correo inválido";
+    document.getElementById("loginError").innerText = mensaje;
+  }
+};
+
+// REGISTRO
+window.register = async () => {
+  const name = document.getElementById("regName").value.trim();
+  const email = document.getElementById("regEmail").value.trim();
+  const pass = document.getElementById("regPassword").value;
+  const passConfirm = document.getElementById("regPasswordConfirm").value;
+
+  if (!name || !email || !pass || !passConfirm) {
+    document.getElementById("regError").innerText = "❌ Completa todos los campos";
+    return;
+  }
+
+  if (pass !== passConfirm) {
+    document.getElementById("regError").innerText = "❌ Las contraseñas no coinciden";
+    return;
+  }
+
+  if (pass.length < 6) {
+    document.getElementById("regError").innerText = "❌ La contraseña debe tener mínimo 6 caracteres";
+    return;
+  }
+
+  try {
+    await createUserWithEmailAndPassword(auth, email, pass);
+    document.getElementById("regError").innerText = "✅ Cuenta creada. Inicia sesión";
+    setTimeout(() => mostrarLogin(), 1500);
+  } catch (error) {
+    console.error("Error:", error);
+    let mensaje = "❌ Error al registrarse";
+    if (error.code === "auth/email-already-in-use") mensaje = "❌ El correo ya está registrado";
+    if (error.code === "auth/weak-password") mensaje = "❌ Contraseña muy débil";
+    if (error.code === "auth/invalid-email") mensaje = "❌ Correo inválido";
+    document.getElementById("regError").innerText = mensaje;
+  }
+};
+
+// CAMBIAR A LOGIN
+window.mostrarLogin = () => {
+  document.getElementById("loginDiv").style.display = "block";
+  document.getElementById("registerDiv").style.display = "none";
+};
+
+// CAMBIAR A REGISTRO
+window.mostrarRegistro = () => {
+  document.getElementById("loginDiv").style.display = "none";
+  document.getElementById("registerDiv").style.display = "block";
+};
+
+// LOGOUT
+window.logout = async () => {
+  await signOut(auth);
 };
 
 // CONTROL DE SESIÓN
 onAuthStateChanged(auth, user => {
   if (user) {
     document.getElementById("loginDiv").style.display = "none";
+    document.getElementById("registerDiv").style.display = "none";
     document.getElementById("appDiv").style.display = "block";
+    document.getElementById("userEmail").innerText = user.email;
     cargar();
+  } else {
+    document.getElementById("appDiv").style.display = "none";
+    document.getElementById("loginDiv").style.display = "block";
+    document.getElementById("registerDiv").style.display = "none";
   }
 });
 
