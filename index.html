@@ -9,79 +9,425 @@
 <meta name="theme-color" content="#0f0f0f">
 
 <style>
-body {
+/* Reset y base */
+* {
   margin: 0;
-  font-family: Arial;
-  background: #0f0f0f;
-  color: white;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: #333;
+  line-height: 1.6;
 }
 
 .container {
-  padding: 15px;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.header h1 {
+  color: #2c3e50;
+  font-size: 2.5em;
+  font-weight: 700;
+  margin-bottom: 5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header p {
+  color: #7f8c8d;
+  font-size: 1.1em;
+  font-weight: 300;
+}
+
+/* Cards */
 .card {
-  background: #1c1c1c;
-  padding: 12px;
-  border-radius: 12px;
-  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-input, select, button {
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 1.4em;
+  font-weight: 600;
+  text-align: center;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 10px;
+}
+
+/* Form elements */
+input, select, button, textarea {
   width: 100%;
-  padding: 12px;
-  margin: 6px 0;
+  padding: 15px;
+  margin: 8px 0;
+  border: 2px solid #e1e8ed;
   border-radius: 10px;
-  border: none;
   font-size: 16px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
 }
 
-input, select {
-  background: #2a2a2a;
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+input::placeholder, textarea::placeholder {
+  color: #95a5a6;
+  font-style: italic;
+}
+
+/* Buttons */
+button {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 14px;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #2980b9, #21618c);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button.secondary {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+}
+
+button.secondary:hover {
+  background: linear-gradient(135deg, #7f8c8d, #6c7b7d);
+}
+
+button.danger {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+button.danger:hover {
+  background: linear-gradient(135deg, #c0392b, #a93226);
+}
+
+/* Auth specific */
+.auth-container {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+  background: #f8f9fa;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  color: #7f8c8d;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.auth-tab.active {
+  background: #3498db;
   color: white;
 }
 
-button {
-  background: gold;
-  font-weight: bold;
+.auth-form {
+  display: none;
 }
 
-h2 {
-  text-align: center;
+.auth-form.active {
+  display: block;
 }
 
-/* POS botones rápidos */
+/* Grid and buttons */
 .grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
 }
 
 .btn-producto {
-  padding: 15px;
-  background: #333;
+  padding: 20px 15px;
+  background: linear-gradient(135deg, #27ae60, #229954);
   border-radius: 12px;
   text-align: center;
   cursor: pointer;
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
+.btn-producto:hover {
+  background: linear-gradient(135deg, #229954, #1e8449);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
+}
+
+.btn-producto:active {
+  transform: translateY(0);
+}
+
+/* List items */
+.item-card {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 4px solid #3498db;
+  transition: all 0.3s ease;
+}
+
+.item-card:hover {
+  background: #e9ecef;
+  transform: translateX(5px);
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-info strong {
+  color: #2c3e50;
+  font-size: 1.1em;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.item-info small {
+  color: #7f8c8d;
+  font-size: 0.9em;
+}
+
+.item-total {
+  font-weight: bold;
+  color: #27ae60;
+  font-size: 1.2em;
+  margin: 0 15px;
+}
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+}
+
+.stat-value {
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.stat-label {
+  font-size: 0.9em;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Messages */
+.success {
+  background: linear-gradient(135deg, #27ae60, #229954);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 15px 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+.error {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 15px 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Logout button */
 .logout-btn {
   position: fixed;
-  top: 15px;
-  right: 15px;
-  padding: 10px 15px;
-  background: #d32f2f;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 25px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 14px;
   z-index: 1000;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+  transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
-  background: #b71c1c;
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  transform: scale(1.05);
+}
+
+/* Install button */
+#installBtn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+  transition: all 0.3s ease;
+  display: none;
+}
+
+#installBtn:hover {
+  background: linear-gradient(135deg, #8e44ad, #7d3c98);
+  transform: scale(1.05);
+}
+
+/* User info */
+.user-info {
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .header h1 {
+    font-size: 2em;
+  }
+
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .logout-btn, #installBtn {
+    padding: 10px 15px;
+    font-size: 12px;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card, .item-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Loading state */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #7f8c8d;
+}
+
+.loading::after {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #3498db;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>
 </head>
@@ -89,60 +435,122 @@ h2 {
 <body>
 
 <div class="container" id="loginDiv">
-  <h2>🔐 Login</h2>
-  <input id="email" placeholder="Correo" type="email">
-  <input id="password" type="password" placeholder="Contraseña">
-  <button onclick="login()">Entrar</button>
-  <div id="loginError" style="color: #d32f2f; margin-top: 10px; text-align: center;"></div>
-  <p style="text-align: center; color: #aaa; margin-top: 20px;">¿No tienes cuenta? <a href="#" onclick="mostrarRegistro()" style="color: gold;">Regístrate aquí</a></p>
+  <div class="header">
+    <h1>🍽️ LEOPARDO'S PRO</h1>
+    <p>Sistema de Gestión de Ventas</p>
+  </div>
+
+  <div class="auth-container">
+    <h3 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">Acceso al Sistema</h3>
+    <input id="email" placeholder="Correo electrónico" type="email">
+    <input id="password" type="password" placeholder="Contraseña">
+    <button onclick="login()">Iniciar Sesión</button>
+    <div id="loginError"></div>
+    <p style="text-align: center; color: #7f8c8d; margin-top: 20px; font-size: 14px;">¿No tienes cuenta? <a href="#" onclick="mostrarRegistro()" style="color: #3498db; text-decoration: none; font-weight: 600;">Regístrate aquí</a></p>
+  </div>
 </div>
 
 <div class="container" id="registerDiv" style="display:none">
-  <h2>📝 Registrarse</h2>
-  <input id="regName" placeholder="Nombre completo">
-  <input id="regEmail" placeholder="Correo" type="email">
-  <input id="regPassword" type="password" placeholder="Contraseña">
-  <input id="regPasswordConfirm" type="password" placeholder="Confirmar contraseña">
-  <button onclick="register()">Crear Cuenta</button>
-  <div id="regError" style="color: #d32f2f; margin-top: 10px; text-align: center;"></div>
-  <p style="text-align: center; color: #aaa; margin-top: 20px;">¿Ya tienes cuenta? <a href="#" onclick="mostrarLogin()" style="color: gold;">Inicia sesión</a></p>
+  <div class="header">
+    <h1>🍽️ LEOPARDO'S PRO</h1>
+    <p>Sistema de Gestión de Ventas</p>
+  </div>
+
+  <div class="auth-container">
+    <h3 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">Registro de Usuario</h3>
+    <input id="regName" placeholder="Nombre completo">
+    <input id="regEmail" placeholder="Correo electrónico" type="email">
+    <input id="regPassword" type="password" placeholder="Contraseña">
+    <input id="regPasswordConfirm" type="password" placeholder="Confirmar contraseña">
+    <button onclick="register()">Crear Cuenta</button>
+    <div id="regError"></div>
+    <p style="text-align: center; color: #7f8c8d; margin-top: 20px; font-size: 14px;">¿Ya tienes cuenta? <a href="#" onclick="mostrarLogin()" style="color: #3498db; text-decoration: none; font-weight: 600;">Inicia sesión</a></p>
+  </div>
 </div>
 
 <div class="container" id="appDiv" style="display:none">
 
-<button class="logout-btn" onclick="logout()">🔒 Salir</button>
-<button id="installBtn" class="logout-btn" style="right: auto; left: 15px; display: none; background: #333;">⬇️ Instalar App</button>
+<button class="logout-btn" onclick="logout()">🔒 Cerrar Sesión</button>
+<button id="installBtn">⬇️ Instalar App</button>
 
-<h2>🐆 LEOPARDO'S</h2>
-<p style="text-align: center; color: #aaa; font-size: 14px;">Usuario: <strong id="userEmail"></strong></p>
-
-<!-- BOTONES RÁPIDOS -->
-<div class="grid">
-  <div class="btn-producto" onclick="rapido('Hamburguesa',15)">🍔 Hamburguesa</div>
-  <div class="btn-producto" onclick="rapido('Gaseosa',5)">🥤 Gaseosa</div>
-  <div class="btn-producto" onclick="rapido('Papas',8)">🍟 Papas</div>
-  <div class="btn-producto" onclick="rapido('Hot Dog',10)">🌭 Hot Dog</div>
+<div class="header">
+  <h1>🍽️ LEOPARDO'S PRO</h1>
+  <p>Panel de Control</p>
 </div>
 
-<!-- FORM -->
-<div class="card">
-  <input id="producto" placeholder="Producto">
-  <input id="cantidad" type="number" value="1">
-  <input id="precio" type="number" placeholder="Precio">
+<div class="user-info">
+  👤 Usuario: <strong id="userEmail"></strong>
+</div>
 
+<!-- PRODUCTOS RÁPIDOS -->
+<div class="card">
+  <h3>🍽️ Productos Rápidos</h3>
+  <div class="grid">
+    <div class="btn-producto" onclick="rapido('Hamburguesa', 15)">
+      🍔<br><strong>Hamburguesa</strong><br><small>S/ 15.00</small>
+    </div>
+    <div class="btn-producto" onclick="rapido('Hot Dog', 10)">
+      🌭<br><strong>Hot Dog</strong><br><small>S/ 10.00</small>
+    </div>
+    <div class="btn-producto" onclick="rapido('Papas Fritas', 8)">
+      🍟<br><strong>Papas Fritas</strong><br><small>S/ 8.00</small>
+    </div>
+    <div class="btn-producto" onclick="rapido('Gaseosa 500ml', 5)">
+      🥤<br><strong>Gaseosa</strong><br><small>S/ 5.00</small>
+    </div>
+    <div class="btn-producto" onclick="rapido('Café', 4)">
+      ☕<br><strong>Café</strong><br><small>S/ 4.00</small>
+    </div>
+    <div class="btn-producto" onclick="rapido('Cerveza', 12)">
+      🍺<br><strong>Cerveza</strong><br><small>S/ 12.00</small>
+    </div>
+    <div class="btn-producto" onclick="rapido('Pollo con Papas', 18)">
+      🍗<br><strong>Pollo + Papas</strong><br><small>S/ 18.00</small>
+    </div>
+    <div class="btn-producto" onclick="rapido('Combo Familiar', 35)">
+      👨‍👩‍👧‍👦<br><strong>Combo Familiar</strong><br><small>S/ 35.00</small>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTRAR VENTA -->
+<div class="card">
+  <h3>💰 Nueva Venta</h3>
+  <input id="producto" placeholder="Nombre del producto">
+  <input id="cantidad" type="number" value="1" min="1" placeholder="Cantidad">
+  <input id="precio" type="number" placeholder="Precio unitario" step="0.01">
+
+  <label style="color: #2c3e50; font-weight: 600; margin: 10px 0 5px 0; display: block;">Método de Pago:</label>
   <select id="metodo">
-    <option>Efectivo</option>
-    <option>Yape</option>
-    <option>Plin</option>
+    <option value="Efectivo">💵 Efectivo</option>
+    <option value="Yape">📱 Yape</option>
+    <option value="Plin">💙 Plin</option>
+    <option value="Tarjeta">💳 Tarjeta de Crédito</option>
   </select>
 
-  <button onclick="guardar()">💰 Registrar</button>
+  <input id="nota" placeholder="Notas adicionales (opcional)">
+  <button onclick="guardar()">✅ Registrar Venta</button>
 </div>
 
-<h3>Ventas</h3>
-<div id="lista"></div>
+<!-- ESTADÍSTICAS -->
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-value" id="totalVentas">S/ 0.00</div>
+    <div class="stat-label">Total de Ventas</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" id="cantVentas">0</div>
+    <div class="stat-label">Transacciones</div>
+  </div>
+</div>
 
-<h2>Total: S/ <span id="total">0</span></h2>
+<!-- HISTORIAL DE VENTAS -->
+<div class="card">
+  <h3>📋 Historial de Ventas</h3>
+  <div id="lista">
+    <div class="loading">Cargando ventas...</div>
+  </div>
+</div>
 
 </div>
 
@@ -179,20 +587,20 @@ window.login = async () => {
   const pass = document.getElementById("password").value;
 
   if (!email || !pass) {
-    document.getElementById("loginError").innerText = "❌ Completa todos los campos";
+    mostrarError("Completa todos los campos");
     return;
   }
 
   try {
     await signInWithEmailAndPassword(auth, email, pass);
-    document.getElementById("loginError").innerText = "";
+    mostrarExito("¡Bienvenido de vuelta!");
   } catch (error) {
     console.error("Error:", error);
-    let mensaje = "❌ Correo o contraseña incorrectos";
-    if (error.code === "auth/user-not-found") mensaje = "❌ El correo no está registrado";
-    if (error.code === "auth/wrong-password") mensaje = "❌ Contraseña incorrecta";
-    if (error.code === "auth/invalid-email") mensaje = "❌ Correo inválido";
-    document.getElementById("loginError").innerText = mensaje;
+    let mensaje = "Correo o contraseña incorrectos";
+    if (error.code === "auth/user-not-found") mensaje = "El correo no está registrado";
+    if (error.code === "auth/wrong-password") mensaje = "Contraseña incorrecta";
+    if (error.code === "auth/invalid-email") mensaje = "Correo inválido";
+    mostrarError(mensaje);
   }
 };
 
@@ -204,31 +612,31 @@ window.register = async () => {
   const passConfirm = document.getElementById("regPasswordConfirm").value;
 
   if (!name || !email || !pass || !passConfirm) {
-    document.getElementById("regError").innerText = "❌ Completa todos los campos";
+    mostrarError("Completa todos los campos");
     return;
   }
 
   if (pass !== passConfirm) {
-    document.getElementById("regError").innerText = "❌ Las contraseñas no coinciden";
+    mostrarError("Las contraseñas no coinciden");
     return;
   }
 
   if (pass.length < 6) {
-    document.getElementById("regError").innerText = "❌ La contraseña debe tener mínimo 6 caracteres";
+    mostrarError("La contraseña debe tener mínimo 6 caracteres");
     return;
   }
 
   try {
     await createUserWithEmailAndPassword(auth, email, pass);
-    document.getElementById("regError").innerText = "✅ Cuenta creada. Inicia sesión";
+    mostrarExito("✅ Cuenta creada exitosamente. ¡Bienvenido!");
     setTimeout(() => mostrarLogin(), 1500);
   } catch (error) {
     console.error("Error:", error);
-    let mensaje = "❌ Error al registrarse";
-    if (error.code === "auth/email-already-in-use") mensaje = "❌ El correo ya está registrado";
-    if (error.code === "auth/weak-password") mensaje = "❌ Contraseña muy débil";
-    if (error.code === "auth/invalid-email") mensaje = "❌ Correo inválido";
-    document.getElementById("regError").innerText = mensaje;
+    let mensaje = "Error al registrarse";
+    if (error.code === "auth/email-already-in-use") mensaje = "El correo ya está registrado";
+    if (error.code === "auth/weak-password") mensaje = "Contraseña muy débil";
+    if (error.code === "auth/invalid-email") mensaje = "Correo inválido";
+    mostrarError(mensaje);
   }
 };
 
@@ -261,6 +669,14 @@ onAuthStateChanged(auth, user => {
     document.getElementById("appDiv").style.display = "none";
     document.getElementById("loginDiv").style.display = "block";
     document.getElementById("registerDiv").style.display = "none";
+
+    // Limpiar formularios
+    document.getElementById("email").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("regName").value = "";
+    document.getElementById("regEmail").value = "";
+    document.getElementById("regPassword").value = "";
+    document.getElementById("regPasswordConfirm").value = "";
   }
 });
 
@@ -274,46 +690,44 @@ window.rapido = (nombre, precio) => {
 // GUARDAR
 window.guardar = async () => {
   console.log("Función guardar iniciada");
-  
+
   const producto = document.getElementById("producto").value?.trim();
   const cantidad = parseFloat(document.getElementById("cantidad").value);
   const precio = parseFloat(document.getElementById("precio").value);
   const metodo = document.getElementById("metodo").value;
+  const nota = document.getElementById("nota").value?.trim();
 
-  console.log("Datos recibidos:", { producto, cantidad, precio, metodo });
+  console.log("Datos recibidos:", { producto, cantidad, precio, metodo, nota });
 
   if (!producto) {
-    alert("❌ El producto no puede estar vacío");
-    console.error("Producto vacío");
+    mostrarError("El nombre del producto es obligatorio");
     return;
   }
 
   if (!cantidad || cantidad < 1 || isNaN(cantidad)) {
-    alert("❌ La cantidad debe ser mayor a 0");
-    console.error("Cantidad inválida:", cantidad);
+    mostrarError("La cantidad debe ser mayor a 0");
     return;
   }
 
   if (!precio || precio < 0 || isNaN(precio)) {
-    alert("❌ El precio debe ser válido");
-    console.error("Precio inválido:", precio);
+    mostrarError("El precio debe ser válido");
     return;
   }
 
   if (!auth.currentUser) {
-    alert("❌ Debes estar logueado");
-    console.error("Usuario no autenticado");
+    mostrarError("Debes estar logueado para registrar ventas");
     return;
   }
 
   try {
     console.log("Intentando guardar en Firestore...");
-    
+
     const docRef = await addDoc(collection(db, "ventas"), {
       producto,
       cantidad: parseFloat(cantidad),
       precio: parseFloat(precio),
       metodo,
+      nota: nota || "",
       total: parseFloat(cantidad) * parseFloat(precio),
       fecha: new Date().toISOString(),
       usuario: auth.currentUser.email,
@@ -321,61 +735,134 @@ window.guardar = async () => {
     });
 
     console.log("Venta guardada con ID:", docRef.id);
-    alert("✅ Venta registrada correctamente");
-    
+    mostrarExito("✅ Venta registrada correctamente");
+
+    // Limpiar formulario
     document.getElementById("producto").value = "";
     document.getElementById("cantidad").value = "1";
     document.getElementById("precio").value = "";
-    
+    document.getElementById("nota").value = "";
+
     await cargar();
   } catch (error) {
     console.error("Error completo:", error);
     console.error("Código de error:", error.code);
     console.error("Mensaje:", error.message);
-    
-    let mensajeError = error.message;
+
+    let mensajeError = "Error al registrar la venta";
     if (error.code === "permission-denied") {
-      mensajeError = "No tienes permisos en la base de datos. Revisa las reglas de Firestore.";
+      mensajeError = "No tienes permisos. Verifica las reglas de Firestore.";
     }
-    
-    alert("❌ Error: " + mensajeError);
+
+    mostrarError("❌ " + mensajeError);
   }
 };
 
 // LISTA
 async function cargar() {
   const lista = document.getElementById("lista");
-  lista.innerHTML = "";
+  lista.innerHTML = '<div class="loading">Cargando ventas...</div>';
 
   let total = 0;
+  let cantVentas = 0;
 
   try {
     const data = await getDocs(collection(db, "ventas"));
 
+    if (data.empty) {
+      lista.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 20px;">No hay ventas registradas aún</p>';
+      actualizarEstadisticas(0, 0);
+      return;
+    }
+
+    lista.innerHTML = "";
+
     data.forEach(d => {
       const v = d.data();
       total += v.total;
+      cantVentas++;
+
+      const fecha = new Date(v.fecha).toLocaleString('es-PE', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
 
       lista.innerHTML += `
-        <div class="card">
-          <strong>${v.producto}</strong> x${v.cantidad} - S/ ${(v.total).toFixed(2)}
-          <br><small>${v.metodo} - ${new Date(v.fecha).toLocaleString('es-PE')}</small>
-          <button onclick="eliminar('${d.id}')" style="margin-top: 8px; background: #d32f2f; padding: 8px;">❌ Eliminar</button>
+        <div class="item-card">
+          <div class="item-info">
+            <strong>${v.producto}</strong> x${v.cantidad}
+            <small>${v.metodo} • ${fecha}</small>
+            ${v.nota ? `<br><small style="color: #95a5a6;">Nota: ${v.nota}</small>` : ''}
+          </div>
+          <div class="item-total">S/ ${v.total.toFixed(2)}</div>
+          <button class="danger" onclick="eliminar('${d.id}')" style="padding: 8px 12px; font-size: 12px;">🗑️</button>
         </div>
       `;
     });
+
+    actualizarEstadisticas(total, cantVentas);
   } catch (error) {
     console.error("Error al cargar ventas:", error);
-    lista.innerHTML = '<p style="color: #d32f2f;">Error al cargar las ventas</p>';
+    lista.innerHTML = '<p style="color: #e74c3c; text-align: center; padding: 20px;">Error al cargar las ventas</p>';
   }
+}
 
-  document.getElementById("total").innerText = total.toFixed(2);
+// FUNCIONES DE MENSAJES
+function mostrarError(mensaje) {
+  const errorDiv = document.createElement('div');
+  errorDiv.className = 'error';
+  errorDiv.innerHTML = mensaje;
+  errorDiv.style.position = 'fixed';
+  errorDiv.style.top = '20px';
+  errorDiv.style.left = '50%';
+  errorDiv.style.transform = 'translateX(-50%)';
+  errorDiv.style.zIndex = '10000';
+  errorDiv.style.maxWidth = '90%';
+  errorDiv.style.width = 'auto';
+
+  document.body.appendChild(errorDiv);
+  setTimeout(() => errorDiv.remove(), 4000);
+}
+
+function mostrarExito(mensaje) {
+  const exitoDiv = document.createElement('div');
+  exitoDiv.className = 'success';
+  exitoDiv.innerHTML = mensaje;
+  exitoDiv.style.position = 'fixed';
+  exitoDiv.style.top = '20px';
+  exitoDiv.style.left = '50%';
+  exitoDiv.style.transform = 'translateX(-50%)';
+  exitoDiv.style.zIndex = '10000';
+  exitoDiv.style.maxWidth = '90%';
+  exitoDiv.style.width = 'auto';
+
+  document.body.appendChild(exitoDiv);
+  setTimeout(() => exitoDiv.remove(), 3000);
+}
+
+// ACTUALIZAR ESTADÍSTICAS
+function actualizarEstadisticas(total, cantidad) {
+  document.getElementById("totalVentas").innerText = "S/ " + total.toFixed(2);
+  document.getElementById("cantVentas").innerText = cantidad;
 }
 
 // ELIMINAR
 window.eliminar = async (id) => {
-  await deleteDoc(doc(db, "ventas", id));
-  cargar();
+  if (!confirm("¿Estás seguro de que deseas eliminar esta venta?")) {
+    return;
+  }
+
+  try {
+    await deleteDoc(doc(db, "ventas", id));
+    mostrarExito("✅ Venta eliminada correctamente");
+    await cargar();
+  } catch (error) {
+    console.error("Error al eliminar:", error);
+    mostrarError("❌ Error al eliminar la venta");
+  }
 };
 let deferredInstallPrompt = null;
 window.installApp = async () => {
