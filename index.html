@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LEOPARDO'S PRO</title>
+<title>LEOPARDO'S VENTAS</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#0f0f0f">
@@ -18,9 +18,9 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  background: #f5f7fa;
+  background: #f0f0f0;
   min-height: 100vh;
-  color: #2c3e50;
+  color: #1a1a1a;
   line-height: 1.6;
 }
 
@@ -42,7 +42,7 @@ body {
 }
 
 .header h1 {
-  color: #1a2332;
+  color: #000000;
   font-size: 2.2em;
   font-weight: 700;
   margin-bottom: 8px;
@@ -50,7 +50,7 @@ body {
 }
 
 .header p {
-  color: #6b7d93;
+  color: #666666;
   font-size: 1em;
   font-weight: 400;
 }
@@ -61,8 +61,8 @@ body {
   padding: 30px;
   border-radius: 12px;
   margin-bottom: 25px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e8ecf1;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
   transition: box-shadow 0.3s ease;
 }
 
@@ -71,12 +71,12 @@ body {
 }
 
 .card h3 {
-  color: #1a2332;
+  color: #000000;
   margin-bottom: 25px;
   font-size: 1.3em;
   font-weight: 600;
   text-align: left;
-  border-bottom: 2px solid #3b82f6;
+  border-bottom: 2px solid #333333;
   padding-bottom: 15px;
 }
 
@@ -85,29 +85,29 @@ input, select, button, textarea {
   width: 100%;
   padding: 12px 15px;
   margin: 10px 0;
-  border: 1px solid #d1dce6;
+  border: 1px solid #cccccc;
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
   transition: all 0.3s ease;
-  background: #f9fafb;
+  background: #fafafa;
 }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: #333333;
   background: white;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
 input::placeholder, textarea::placeholder {
-  color: #9ca3af;
+  color: #999999;
   font-style: normal;
 }
 
 /* Buttons */
 button {
-  background: #3b82f6;
+  background: #333333;
   color: white;
   font-weight: 600;
   cursor: pointer;
@@ -119,8 +119,8 @@ button {
 }
 
 button:hover {
-  background: #2563eb;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  background: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 button:active {
@@ -128,19 +128,19 @@ button:active {
 }
 
 button.secondary {
-  background: #6b7d93;
+  background: #666666;
 }
 
 button.secondary:hover {
-  background: #5a6a7a;
+  background: #555555;
 }
 
 button.danger {
-  background: #ef4444;
+  background: #666666;
 }
 
 button.danger:hover {
-  background: #dc2626;
+  background: #555555;
 }
 
 /* Auth specific */
@@ -148,8 +148,8 @@ button.danger:hover {
   background: white;
   padding: 40px;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e8ecf1;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
   max-width: 450px;
   margin: 0 auto;
 }
@@ -199,25 +199,25 @@ button.danger:hover {
 .btn-producto {
   padding: 20px 15px;
   background: white;
-  border: 1px solid #d1dce6;
+  border: 1px solid #cccccc;
   border-radius: 10px;
   text-align: center;
   cursor: pointer;
-  color: #1a2332;
+  color: #000000;
   font-weight: 600;
   font-size: 13px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-transform: none;
   letter-spacing: 0;
 }
 
 .btn-producto:hover {
-  background: #3b82f6;
+  background: #333333;
   color: white;
-  border-color: #3b82f6;
+  border-color: #333333;
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .btn-producto:active {
@@ -226,22 +226,22 @@ button.danger:hover {
 
 /* List items */
 .item-card {
-  background: #f9fafb;
+  background: #f5f5f5;
   padding: 20px;
   border-radius: 10px;
   margin: 12px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-left: 3px solid #3b82f6;
-  border: 1px solid #e5e7eb;
-  border-left: 3px solid #3b82f6;
+  border-left: 3px solid #333333;
+  border: 1px solid #dedede;
+  border-left: 3px solid #333333;
   transition: all 0.3s ease;
 }
 
 .item-card:hover {
-  background: #f3f4f6;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: #eeeeee;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .item-info {
@@ -249,20 +249,20 @@ button.danger:hover {
 }
 
 .item-info strong {
-  color: #1a2332;
+  color: #000000;
   font-size: 1em;
   display: block;
   margin-bottom: 5px;
 }
 
 .item-info small {
-  color: #6b7d93;
+  color: #777777;
   font-size: 0.85em;
 }
 
 .item-total {
   font-weight: 700;
-  color: #059669;
+  color: #000000;
   font-size: 1.1em;
   margin: 0 20px;
 }
@@ -276,13 +276,13 @@ button.danger:hover {
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: linear-gradient(135deg, #333333, #1a1a1a);
   padding: 30px;
   border-radius: 12px;
   text-align: center;
   color: white;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .stat-value {
@@ -303,7 +303,7 @@ button.danger:hover {
 
 /* Messages */
 .success {
-  background: #10b981;
+  background: #333333;
   color: white;
   padding: 15px 20px;
   border-radius: 8px;
@@ -314,7 +314,7 @@ button.danger:hover {
 }
 
 .error {
-  background: #ef4444;
+  background: #666666;
   color: white;
   padding: 15px 20px;
   border-radius: 8px;
@@ -330,7 +330,7 @@ button.danger:hover {
   top: 20px;
   right: 20px;
   padding: 12px 20px;
-  background: #ef4444;
+  background: #666666;
   color: white;
   border: none;
   border-radius: 8px;
@@ -338,12 +338,12 @@ button.danger:hover {
   font-weight: 600;
   font-size: 14px;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
-  background: #dc2626;
+  background: #555555;
   transform: scale(1.05);
 }
 
@@ -353,7 +353,7 @@ button.danger:hover {
   top: 20px;
   left: 20px;
   padding: 12px 20px;
-  background: #8b5cf6;
+  background: #555555;
   color: white;
   border: none;
   border-radius: 8px;
@@ -361,13 +361,13 @@ button.danger:hover {
   font-weight: 600;
   font-size: 14px;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
   display: none;
 }
 
 #installBtn:hover {
-  background: #7c3aed;
+  background: #444444;
   transform: scale(1.05);
 }
 
@@ -376,11 +376,11 @@ button.danger:hover {
   text-align: center;
   margin-bottom: 25px;
   padding: 20px;
-  background: #f0f9ff;
+  background: #f0f0f0;
   border-radius: 10px;
   font-weight: 600;
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
+  color: #000000;
+  border: 1px solid #e0e0e0;
 }
 
 /* Responsive */
@@ -432,7 +432,7 @@ button.danger:hover {
 .loading {
   text-align: center;
   padding: 40px;
-  color: #6b7d93;
+  color: #777777;
   font-size: 14px;
 }
 
@@ -441,8 +441,8 @@ button.danger:hover {
   display: inline-block;
   width: 16px;
   height: 16px;
-  border: 2px solid #d1dce6;
-  border-color: #3b82f6 transparent #3b82f6 transparent;
+  border: 2px solid #dddddd;
+  border-color: #333333 transparent #333333 transparent;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-left: 8px;
@@ -464,12 +464,12 @@ button.danger:hover {
   </div>
 
   <div class="auth-container">
-    <h3 style="text-align: center; margin-bottom: 25px; color: #1a2332; font-size: 1.3em; font-weight: 600;">Acceso al Sistema</h3>
+    <h3 style="text-align: center; margin-bottom: 25px; color: #000000; font-size: 1.3em; font-weight: 600;">Acceso al Sistema</h3>
     <input id="email" placeholder="Correo electrónico" type="email">
     <input id="password" type="password" placeholder="Contraseña">
     <button onclick="login()">Iniciar Sesión</button>
     <div id="loginError"></div>
-    <p style="text-align: center; color: #6b7d93; margin-top: 20px; font-size: 13px;">¿No tienes cuenta? <a href="#" onclick="mostrarRegistro()" style="color: #3b82f6; text-decoration: none; font-weight: 600;">Regístrate aquí</a></p>
+    <p style="text-align: center; color: #777777; margin-top: 20px; font-size: 13px;">¿No tienes cuenta? <a href="#" onclick="mostrarRegistro()" style="color: #333333; text-decoration: none; font-weight: 600;">Regístrate aquí</a></p>
   </div>
 </div>
 
@@ -480,14 +480,14 @@ button.danger:hover {
   </div>
 
   <div class="auth-container">
-    <h3 style="text-align: center; margin-bottom: 25px; color: #1a2332; font-size: 1.3em; font-weight: 600;">Registro de Usuario</h3>
+    <h3 style="text-align: center; margin-bottom: 25px; color: #000000; font-size: 1.3em; font-weight: 600;">Registro de Usuario</h3>
     <input id="regName" placeholder="Nombre completo">
     <input id="regEmail" placeholder="Correo electrónico" type="email">
     <input id="regPassword" type="password" placeholder="Contraseña">
     <input id="regPasswordConfirm" type="password" placeholder="Confirmar contraseña">
     <button onclick="register()">Crear Cuenta</button>
     <div id="regError"></div>
-    <p style="text-align: center; color: #6b7d93; margin-top: 20px; font-size: 13px;">¿Ya tienes cuenta? <a href="#" onclick="mostrarLogin()" style="color: #3b82f6; text-decoration: none; font-weight: 600;">Inicia sesión</a></p>
+    <p style="text-align: center; color: #777777; margin-top: 20px; font-size: 13px;">¿Ya tienes cuenta? <a href="#" onclick="mostrarLogin()" style="color: #333333; text-decoration: none; font-weight: 600;">Inicia sesión</a></p>
   </div>
 </div>
 
@@ -543,7 +543,7 @@ button.danger:hover {
   <input id="cantidad" type="number" value="1" min="1" placeholder="Cantidad">
   <input id="precio" type="number" placeholder="Precio unitario" step="0.01">
 
-  <label style="color: #1a2332; font-weight: 600; margin: 15px 0 8px 0; display: block; font-size: 14px;">Método de Pago</label>
+  <label style="color: #000000; font-weight: 600; margin: 15px 0 8px 0; display: block; font-size: 14px;">Método de Pago</label>
   <select id="metodo">
     <option value="Efectivo">💵 Efectivo</option>
     <option value="Yape">📱 Yape</option>
