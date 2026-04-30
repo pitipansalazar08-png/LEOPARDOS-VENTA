@@ -269,41 +269,72 @@ window.rapido = (nombre, precio) => {
 
 // GUARDAR
 window.guardar = async () => {
-  const producto = document.getElementById("producto").value.trim();
-  const cantidad = Number(document.getElementById("cantidad").value);
-  const precio = Number(document.getElementById("precio").value);
+  console.log("Función guardar iniciada");
+  
+  const producto = document.getElementById("producto").value?.trim();
+  const cantidad = parseFloat(document.getElementById("cantidad").value);
+  const precio = parseFloat(document.getElementById("precio").value);
   const metodo = document.getElementById("metodo").value;
 
-  if (!producto || !cantidad || !precio) {
-    alert("❌ Completa todos los campos");
+  console.log("Datos recibidos:", { producto, cantidad, precio, metodo });
+
+  if (!producto) {
+    alert("❌ El producto no puede estar vacío");
+    console.error("Producto vacío");
     return;
   }
 
-  if (cantidad < 1 || precio < 0) {
-    alert("❌ Valores inválidos");
+  if (!cantidad || cantidad < 1 || isNaN(cantidad)) {
+    alert("❌ La cantidad debe ser mayor a 0");
+    console.error("Cantidad inválida:", cantidad);
+    return;
+  }
+
+  if (!precio || precio < 0 || isNaN(precio)) {
+    alert("❌ El precio debe ser válido");
+    console.error("Precio inválido:", precio);
+    return;
+  }
+
+  if (!auth.currentUser) {
+    alert("❌ Debes estar logueado");
+    console.error("Usuario no autenticado");
     return;
   }
 
   try {
-    await addDoc(collection(db, "ventas"), {
+    console.log("Intentando guardar en Firestore...");
+    
+    const docRef = await addDoc(collection(db, "ventas"), {
       producto,
-      cantidad,
-      precio,
+      cantidad: parseFloat(cantidad),
+      precio: parseFloat(precio),
       metodo,
-      total: cantidad * precio,
+      total: parseFloat(cantidad) * parseFloat(precio),
       fecha: new Date().toISOString(),
-      usuario: auth.currentUser.email
+      usuario: auth.currentUser.email,
+      timestamp: new Date()
     });
 
+    console.log("Venta guardada con ID:", docRef.id);
     alert("✅ Venta registrada correctamente");
+    
     document.getElementById("producto").value = "";
     document.getElementById("cantidad").value = "1";
     document.getElementById("precio").value = "";
     
-    cargar();
+    await cargar();
   } catch (error) {
-    console.error("Error:", error);
-    alert("❌ Error al registrar venta: " + error.message);
+    console.error("Error completo:", error);
+    console.error("Código de error:", error.code);
+    console.error("Mensaje:", error.message);
+    
+    let mensajeError = error.message;
+    if (error.code === "permission-denied") {
+      mensajeError = "No tienes permisos en la base de datos. Revisa las reglas de Firestore.";
+    }
+    
+    alert("❌ Error: " + mensajeError);
   }
 };
 
