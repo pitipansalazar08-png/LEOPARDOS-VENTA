@@ -939,6 +939,13 @@ async function cargar() {
       ventasPorFecha[fecha][v.mesa].push({ ...v, id: d.id });
     });
 
+    // Ordenar ventas dentro de cada mesa por fecha
+    for (const fecha in ventasPorFecha) {
+      for (const mesa in ventasPorFecha[fecha]) {
+        ventasPorFecha[fecha][mesa].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+      }
+    }
+
     lista.innerHTML = "";
 
     // Ordenar fechas de más reciente a más antigua
@@ -954,7 +961,10 @@ async function cargar() {
           <h3 style="color: #000000; margin: 0 0 20px 0; font-size: 1.4em; font-weight: 700;">📅 ${new Date(fecha).toLocaleDateString('es-PE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h3>
       `;
 
-      for (const mesa in mesas) {
+      // Ordenar mesas alfabéticamente
+      const mesasOrdenadas = Object.keys(mesas).sort();
+
+      mesasOrdenadas.forEach(mesa => {
         const ventasMesa = mesas[mesa];
         const totalMesa = ventasMesa.reduce((sum, v) => sum + v.total, 0);
 
@@ -992,7 +1002,7 @@ async function cargar() {
             </div>
           </div>
         `;
-      }
+      });
 
       // Total de la fecha
       lista.innerHTML += `
