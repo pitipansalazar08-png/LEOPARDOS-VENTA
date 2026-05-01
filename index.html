@@ -475,7 +475,7 @@ button.danger:hover {
 
 <div class="container" id="registerDiv" style="display:none">
   <div class="header">
-    <h1>🍽️ LEOPARDO'S PRO</h1>
+    <h1>🍽️ LEOPARDO'S VENTAS</h1>
     <p>Sistema de Gestión de Ventas</p>
   </div>
 
@@ -497,7 +497,7 @@ button.danger:hover {
 <button id="installBtn">⬇️ Instalar App</button>
 
 <div class="header">
-  <h1>🍽️ LEOPARDO'S PRO</h1>
+  <h1>🍽️ LEOPARDO'S VENTAS</h1>
   <p>Panel de Control</p>
 </div>
 
@@ -513,25 +513,25 @@ button.danger:hover {
       🍔<br><strong>Hamburguesa</strong><br><small>S/ 15.00</small>
     </div>
     <div class="btn-producto" onclick="rapido('Hot Dog', 10)">
-      🌭<br><strong>Hot Dog</strong><br><small>S/ 10.00</small>
+      🌭<br><strong>CHORIPAN</strong><br><small>S/ 7.50</small>
     </div>
     <div class="btn-producto" onclick="rapido('Papas Fritas', 8)">
-      🍟<br><strong>Papas Fritas</strong><br><small>S/ 8.00</small>
+      🍟<br><strong>FESTIVAL DE ALITAS</strong><br><small>S/ 38.00</small>
     </div>
     <div class="btn-producto" onclick="rapido('Gaseosa 500ml', 5)">
-      🥤<br><strong>Gaseosa</strong><br><small>S/ 5.00</small>
+      🥤<br><strong>Gaseosa 600ml</strong><br><small>S/ 5.00</small>
     </div>
     <div class="btn-producto" onclick="rapido('Café', 4)">
-      ☕<br><strong>Café</strong><br><small>S/ 4.00</small>
+      ☕<br><strong>Café</strong><br><small>S/ 3.00</small>
     </div>
     <div class="btn-producto" onclick="rapido('Cerveza', 12)">
-      🍺<br><strong>Cerveza</strong><br><small>S/ 12.00</small>
+      🍺<br><strong>Cerveza Pilsen</strong><br><small>S/ 10.00</small>
     </div>
     <div class="btn-producto" onclick="rapido('Pollo con Papas', 18)">
-      🍗<br><strong>Pollo + Papas</strong><br><small>S/ 18.00</small>
+      🍗<br><strong>Pollo broaster 1/4</strong><br><small>S/ 18.00</small>
     </div>
     <div class="btn-producto" onclick="rapido('Combo Familiar', 35)">
-      👨‍👩‍👧‍👦<br><strong>Combo Familiar</strong><br><small>S/ 35.00</small>
+      👨‍👩‍👧‍👦<br><strong>Pollo a la Parrilla</strong><br><small>S/ 20.00</small>
     </div>
   </div>
 </div>
@@ -807,33 +807,64 @@ async function cargar() {
       return;
     }
 
-    lista.innerHTML = "";
+    // Agrupar ventas por mesa
+    const ventasPorMesa = {};
 
     data.forEach(d => {
       const v = d.data();
       total += v.total;
       cantVentas++;
 
-      const fecha = new Date(v.fecha).toLocaleString('es-PE', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+      if (!ventasPorMesa[v.mesa]) {
+        ventasPorMesa[v.mesa] = [];
+      }
+      ventasPorMesa[v.mesa].push({ ...v, id: d.id });
+    });
+
+    lista.innerHTML = "";
+
+    // Mostrar cada mesa como un bloque separado
+    for (const mesa in ventasPorMesa) {
+      const ventasMesa = ventasPorMesa[mesa];
+      const totalMesa = ventasMesa.reduce((sum, v) => sum + v.total, 0);
+
+      // Encabezado de la mesa
+      lista.innerHTML += `
+        <div class="mesa-block" style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #333333;">
+          <h4 style="color: #000000; margin: 0 0 15px 0; font-size: 1.2em; font-weight: 700;">🏷️ ${mesa}</h4>
+      `;
+
+      // Items de la mesa
+      ventasMesa.forEach(v => {
+        const fecha = new Date(v.fecha).toLocaleString('es-PE', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        lista.innerHTML += `
+          <div class="item-card" style="margin-left: 0; margin-right: 0; margin-bottom: 10px;">
+            <div class="item-info">
+              <strong>${v.producto}</strong> x${v.cantidad}
+              <small>${v.metodo} • ${fecha}</small>
+              ${v.nota ? `<br><small style="color: #95a5a6;">Nota: ${v.nota}</small>` : ''}
+            </div>
+            <div class="item-total">S/ ${v.total.toFixed(2)}</div>
+            <button class="danger" onclick="eliminar('${v.id}')" style="padding: 8px 12px; font-size: 12px;">🗑️</button>
+          </div>
+        `;
       });
 
+      // Total de la mesa
       lista.innerHTML += `
-        <div class="item-card">
-          <div class="item-info">
-            <strong>${v.producto}</strong> x${v.cantidad}
-            <small>${v.mesa ? `${v.mesa} • ` : ''}${v.metodo} • ${fecha}</small>
-            ${v.nota ? `<br><small style="color: #95a5a6;">Nota: ${v.nota}</small>` : ''}
+          <div style="text-align: right; padding: 10px 0; border-top: 1px solid #ddd; margin-top: 10px; font-weight: 700; color: #000000;">
+            Total ${mesa}: S/ ${totalMesa.toFixed(2)}
           </div>
-          <div class="item-total">S/ ${v.total.toFixed(2)}</div>
-          <button class="danger" onclick="eliminar('${d.id}')" style="padding: 8px 12px; font-size: 12px;">🗑️</button>
         </div>
       `;
-    });
+    }
 
     actualizarEstadisticas(total, cantVentas);
   } catch (error) {
