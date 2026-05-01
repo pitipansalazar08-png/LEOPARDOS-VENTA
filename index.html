@@ -985,7 +985,7 @@ async function cargar() {
       // Encabezado de la fecha
       lista.innerHTML += `
         <div class="fecha-block">
-          <div class="fecha-title"><span>📅</span> ${new Date(fecha).toLocaleDateString('es-PE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+          <div class="fecha-title"><span>📅</span> ${new Date(fecha).toLocaleDateString('es-PE', { weekday: 'long' })} ${new Date(fecha).getDate()}</div>
       `;
 
       // Ordenar mesas alfabéticamente
