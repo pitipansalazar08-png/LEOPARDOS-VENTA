@@ -196,6 +196,42 @@ button.danger:hover {
   margin: 20px 0;
 }
 
+.mesa-map {
+  margin-top: 15px;
+}
+
+.mesa-map h4 {
+  margin-bottom: 12px;
+  color: #000000;
+  font-size: 1.05em;
+  font-weight: 700;
+}
+
+.mesa-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.mesa-button {
+  padding: 14px 10px;
+  border: 1px solid #cccccc;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  color: #333333;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.mesa-button:hover,
+.mesa-button.selected {
+  background: #333333;
+  color: #ffffff;
+  border-color: #333333;
+}
+
 .btn-producto {
   padding: 20px 15px;
   background: white;
@@ -544,6 +580,20 @@ button.danger:hover {
   <input id="precio" type="number" placeholder="Precio unitario" step="0.01">
   <input id="mesa" placeholder="Mesa 01">
 
+  <div class="mesa-map">
+    <h4>🪑 Mapa de Mesas</h4>
+    <div class="mesa-grid">
+      <button type="button" class="mesa-button" data-mesa="Mesa 01" onclick="setMesa('Mesa 01')">Mesa 01</button>
+      <button type="button" class="mesa-button" data-mesa="Mesa 02" onclick="setMesa('Mesa 02')">Mesa 02</button>
+      <button type="button" class="mesa-button" data-mesa="Mesa 03" onclick="setMesa('Mesa 03')">Mesa 03</button>
+      <button type="button" class="mesa-button" data-mesa="Mesa 04" onclick="setMesa('Mesa 04')">Mesa 04</button>
+      <button type="button" class="mesa-button" data-mesa="Mesa 05" onclick="setMesa('Mesa 05')">Mesa 05</button>
+      <button type="button" class="mesa-button" data-mesa="Mesa 06" onclick="setMesa('Mesa 06')">Mesa 06</button>
+      <button type="button" class="mesa-button" data-mesa="Mesa 07" onclick="setMesa('Mesa 07')">Mesa 07</button>
+      <button type="button" class="mesa-button" data-mesa="Mesa 08" onclick="setMesa('Mesa 08')">Mesa 08</button>
+    </div>
+  </div>
+
   <label style="color: #000000; font-weight: 600; margin: 15px 0 8px 0; display: block; font-size: 14px;">Método de Pago</label>
   <select id="metodo">
     <option value="Efectivo">💵 Efectivo</option>
@@ -709,6 +759,13 @@ window.rapido = (nombre, precio) => {
   document.getElementById("producto").value = nombre;
   document.getElementById("precio").value = precio;
   document.getElementById("cantidad").value = 1;
+};
+
+window.setMesa = (mesa) => {
+  document.getElementById("mesa").value = mesa;
+  document.querySelectorAll('.mesa-button').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.mesa === mesa);
+  });
 };
 
 // GUARDAR
