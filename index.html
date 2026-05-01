@@ -678,7 +678,7 @@ button.danger:hover {
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, getDocs, deleteDoc, doc
+  getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 import {
@@ -940,7 +940,18 @@ async function cargar() {
   let cantVentas = 0;
 
   try {
-    const data = await getDocs(collection(db, "ventas"));
+    const usuarioActual = auth.currentUser?.email;
+    if (!usuarioActual) {
+      lista.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 20px;">Debes iniciar sesión para ver tus ventas.</p>';
+      actualizarEstadisticas(0, 0);
+      return;
+    }
+
+    const ventasQuery = query(
+      collection(db, "ventas"),
+      where("usuario", "==", usuarioActual)
+    );
+    const data = await getDocs(ventasQuery);
 
     if (data.empty) {
       lista.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 20px;">No hay ventas registradas aún</p>';
@@ -953,7 +964,8 @@ async function cargar() {
 
     data.forEach(d => {
       const v = d.data();
-      const fecha = new Date(v.fecha).toISOString().split('T')[0]; // YYYY-MM-DD
+      const fechaVenta = new Date(v.fecha);
+      const fechaClave = `${fechaVenta.getFullYear()}-${String(fechaVenta.getMonth() + 1).padStart(2, '0')}-${String(fechaVenta.getDate()).padStart(2, '0')}`;
       total += v.total;
       cantVentas++;
 
@@ -985,7 +997,7 @@ async function cargar() {
       // Encabezado de la fecha
       lista.innerHTML += `
         <div class="fecha-block">
-          <div class="fecha-title"><span>📅</span> ${new Date(fecha).toLocaleDateString('es-PE', { weekday: 'long' })} ${new Date(fecha).getDate()}</div>
+          <div class="fecha-title"><span>📅</span> ${new Date(fecha).toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
       `;
 
       // Ordenar mesas alfabéticamente
