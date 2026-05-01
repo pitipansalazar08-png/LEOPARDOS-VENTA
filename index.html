@@ -232,6 +232,21 @@ button.danger:hover {
   border-color: #333333;
 }
 
+.image-preview {
+  margin: 12px 0 0;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.image-preview img {
+  max-width: 120px;
+  max-height: 120px;
+  border-radius: 10px;
+  border: 1px solid #cccccc;
+  object-fit: cover;
+}
+
 .btn-producto {
   padding: 20px 15px;
   background: white;
@@ -580,6 +595,10 @@ button.danger:hover {
   <input id="precio" type="number" placeholder="Precio unitario" step="0.01">
   <input id="mesa" placeholder="Mesa 01">
 
+  <label for="imagenVenta" style="color: #000000; font-weight: 600; margin: 15px 0 8px 0; display: block; font-size: 14px;">Adjuntar imagen (opcional)</label>
+  <input id="imagenVenta" type="file" accept="image/*" onchange="mostrarPreview(event)">
+  <div id="previewContainer" class="image-preview" style="display:none;"></div>
+
   <div class="mesa-map">
     <h4>🪑 Mapa de Mesas</h4>
     <div class="mesa-grid">
@@ -768,6 +787,37 @@ window.setMesa = (mesa) => {
   });
 };
 
+window.mostrarPreview = (event) => {
+  const file = event.target.files[0];
+  const previewContainer = document.getElementById('previewContainer');
+  previewContainer.innerHTML = '';
+
+  if (!file) {
+    previewContainer.style.display = 'none';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = document.createElement('img');
+    img.src = reader.result;
+    img.alt = 'Imagen de la venta';
+    previewContainer.appendChild(img);
+    previewContainer.style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+};
+
+const leerImagenBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve('');
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 // GUARDAR
 window.guardar = async () => {
   console.log("Función guardar iniciada");
@@ -801,6 +851,9 @@ window.guardar = async () => {
     return;
   }
 
+  const archivoImagen = document.getElementById('imagenVenta').files[0];
+  const imagenBase64 = await leerImagenBase64(archivoImagen);
+
   if (!auth.currentUser) {
     mostrarError("Debes estar logueado para registrar ventas");
     return;
@@ -816,6 +869,7 @@ window.guardar = async () => {
       mesa,
       metodo,
       nota: nota || "",
+      imagen: imagenBase64 || "",
       total: parseFloat(cantidad) * parseFloat(precio),
       fecha: new Date().toISOString(),
       usuario: auth.currentUser.email,
@@ -831,6 +885,9 @@ window.guardar = async () => {
     document.getElementById("precio").value = "";
     document.getElementById("mesa").value = "";
     document.getElementById("nota").value = "";
+    document.getElementById("imagenVenta").value = "";
+    document.getElementById('previewContainer').innerHTML = '';
+    document.getElementById('previewContainer').style.display = 'none';
 
     await cargar();
   } catch (error) {
@@ -864,64 +921,87 @@ async function cargar() {
       return;
     }
 
-    // Agrupar ventas por mesa
-    const ventasPorMesa = {};
+    // Agrupar ventas por fecha y mesa
+    const ventasPorFecha = {};
 
     data.forEach(d => {
       const v = d.data();
+      const fecha = new Date(v.fecha).toISOString().split('T')[0]; // YYYY-MM-DD
       total += v.total;
       cantVentas++;
 
-      if (!ventasPorMesa[v.mesa]) {
-        ventasPorMesa[v.mesa] = [];
+      if (!ventasPorFecha[fecha]) {
+        ventasPorFecha[fecha] = {};
       }
-      ventasPorMesa[v.mesa].push({ ...v, id: d.id });
+      if (!ventasPorFecha[fecha][v.mesa]) {
+        ventasPorFecha[fecha][v.mesa] = [];
+      }
+      ventasPorFecha[fecha][v.mesa].push({ ...v, id: d.id });
     });
 
     lista.innerHTML = "";
 
-    // Mostrar cada mesa como un bloque separado
-    for (const mesa in ventasPorMesa) {
-      const ventasMesa = ventasPorMesa[mesa];
-      const totalMesa = ventasMesa.reduce((sum, v) => sum + v.total, 0);
+    // Ordenar fechas de más reciente a más antigua
+    const fechasOrdenadas = Object.keys(ventasPorFecha).sort((a, b) => new Date(b) - new Date(a));
 
-      // Encabezado de la mesa
+    fechasOrdenadas.forEach(fecha => {
+      const mesas = ventasPorFecha[fecha];
+      const totalFecha = Object.values(mesas).flat().reduce((sum, v) => sum + v.total, 0);
+
+      // Encabezado de la fecha
       lista.innerHTML += `
-        <div class="mesa-block" style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #333333;">
-          <h4 style="color: #000000; margin: 0 0 15px 0; font-size: 1.2em; font-weight: 700;">🏷️ ${mesa}</h4>
+        <div class="fecha-block" style="background: #e8ecf1; padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 2px solid #333333;">
+          <h3 style="color: #000000; margin: 0 0 20px 0; font-size: 1.4em; font-weight: 700;">📅 ${new Date(fecha).toLocaleDateString('es-PE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h3>
       `;
 
-      // Items de la mesa
-      ventasMesa.forEach(v => {
-        const fecha = new Date(v.fecha).toLocaleString('es-PE', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
+      for (const mesa in mesas) {
+        const ventasMesa = mesas[mesa];
+        const totalMesa = ventasMesa.reduce((sum, v) => sum + v.total, 0);
+
+        // Encabezado de la mesa
+        lista.innerHTML += `
+          <div class="mesa-block" style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ddd;">
+            <h4 style="color: #000000; margin: 0 0 10px 0; font-size: 1.1em; font-weight: 700;">🏷️ ${mesa}</h4>
+        `;
+
+        // Items de la mesa
+        ventasMesa.forEach(v => {
+          const hora = new Date(v.fecha).toLocaleString('es-PE', {
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+
+          lista.innerHTML += `
+            <div class="item-card" style="margin-left: 0; margin-right: 0; margin-bottom: 10px;">
+              <div class="item-info">
+                <strong>${v.producto}</strong> x${v.cantidad}
+                <small>${v.metodo} • ${hora}</small>
+                ${v.nota ? `<br><small style="color: #95a5a6;">Nota: ${v.nota}</small>` : ''}
+                ${v.imagen ? `<br><img src="${v.imagen}" alt="Imagen venta" style="margin-top: 8px; max-width: 120px; border-radius: 10px; border: 1px solid #ccc;">` : ''}
+              </div>
+              <div class="item-total">S/ ${v.total.toFixed(2)}</div>
+              <button class="danger" onclick="eliminar('${v.id}')" style="padding: 8px 12px; font-size: 12px;">🗑️</button>
+            </div>
+          `;
         });
 
+        // Total de la mesa
         lista.innerHTML += `
-          <div class="item-card" style="margin-left: 0; margin-right: 0; margin-bottom: 10px;">
-            <div class="item-info">
-              <strong>${v.producto}</strong> x${v.cantidad}
-              <small>${v.metodo} • ${fecha}</small>
-              ${v.nota ? `<br><small style="color: #95a5a6;">Nota: ${v.nota}</small>` : ''}
+            <div style="text-align: right; padding: 10px 0; border-top: 1px solid #ddd; margin-top: 10px; font-weight: 700; color: #000000;">
+              Total ${mesa}: S/ ${totalMesa.toFixed(2)}
             </div>
-            <div class="item-total">S/ ${v.total.toFixed(2)}</div>
-            <button class="danger" onclick="eliminar('${v.id}')" style="padding: 8px 12px; font-size: 12px;">🗑️</button>
           </div>
         `;
-      });
+      }
 
-      // Total de la mesa
+      // Total de la fecha
       lista.innerHTML += `
-          <div style="text-align: right; padding: 10px 0; border-top: 1px solid #ddd; margin-top: 10px; font-weight: 700; color: #000000;">
-            Total ${mesa}: S/ ${totalMesa.toFixed(2)}
+          <div style="text-align: right; padding: 15px 0; border-top: 2px solid #333; margin-top: 15px; font-weight: 700; color: #000000; font-size: 1.1em;">
+            Total del día: S/ ${totalFecha.toFixed(2)}
           </div>
         </div>
       `;
-    }
+    });
 
     actualizarEstadisticas(total, cantVentas);
   } catch (error) {
