@@ -70,6 +70,33 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
+.fecha-block {
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 14px;
+  margin-bottom: 25px;
+  border: 1px solid #dcdfe3;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.fecha-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #111111;
+  font-size: 1.15em;
+  font-weight: 700;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.fecha-title span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .card h3 {
   color: #000000;
   margin-bottom: 25px;
@@ -957,8 +984,8 @@ async function cargar() {
 
       // Encabezado de la fecha
       lista.innerHTML += `
-        <div class="fecha-block" style="background: #e8ecf1; padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 2px solid #333333;">
-          <h3 style="color: #000000; margin: 0 0 20px 0; font-size: 1.4em; font-weight: 700;">📅 ${new Date(fecha).toLocaleDateString('es-PE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h3>
+        <div class="fecha-block">
+          <div class="fecha-title"><span>📅</span> ${new Date(fecha).toLocaleDateString('es-PE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
       `;
 
       // Ordenar mesas alfabéticamente
