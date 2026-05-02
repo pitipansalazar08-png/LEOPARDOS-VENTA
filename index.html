@@ -964,18 +964,22 @@ async function cargar() {
 
     data.forEach(d => {
       const v = d.data();
-      const fechaVenta = new Date(v.fecha);
+      const fechaVenta = v.fecha && v.fecha.toDate ? v.fecha.toDate() : new Date(v.fecha);
+      if (!fechaVenta || isNaN(fechaVenta.getTime())) {
+        console.warn("Venta con fecha inválida, se omite:", d.id, v.fecha);
+        return;
+      }
       const fechaClave = `${fechaVenta.getFullYear()}-${String(fechaVenta.getMonth() + 1).padStart(2, '0')}-${String(fechaVenta.getDate()).padStart(2, '0')}`;
-      total += v.total;
+      total += v.total || 0;
       cantVentas++;
 
-      if (!ventasPorFecha[fecha]) {
-        ventasPorFecha[fecha] = {};
+      if (!ventasPorFecha[fechaClave]) {
+        ventasPorFecha[fechaClave] = {};
       }
-      if (!ventasPorFecha[fecha][v.mesa]) {
-        ventasPorFecha[fecha][v.mesa] = [];
+      if (!ventasPorFecha[fechaClave][v.mesa]) {
+        ventasPorFecha[fechaClave][v.mesa] = [];
       }
-      ventasPorFecha[fecha][v.mesa].push({ ...v, id: d.id });
+      ventasPorFecha[fechaClave][v.mesa].push({ ...v, id: d.id, fecha: fechaVenta.toISOString() });
     });
 
     // Ordenar ventas dentro de cada mesa por fecha
@@ -993,11 +997,13 @@ async function cargar() {
     fechasOrdenadas.forEach(fecha => {
       const mesas = ventasPorFecha[fecha];
       const totalFecha = Object.values(mesas).flat().reduce((sum, v) => sum + v.total, 0);
+      const [year, month, day] = fecha.split('-');
+      const fechaObj = new Date(year, month - 1, day);
 
       // Encabezado de la fecha
       lista.innerHTML += `
         <div class="fecha-block">
-          <div class="fecha-title"><span>📅</span> ${new Date(fecha).toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
+          <div class="fecha-title"><span>📅</span> ${fechaObj.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
       `;
 
       // Ordenar mesas alfabéticamente
