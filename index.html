@@ -420,6 +420,36 @@ button.danger:hover {
   box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
 }
 
+/* Password requirements */
+.password-requirements {
+  background: #f0f4ff;
+  border-left: 4px solid #667eea;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin: 10px 0;
+  font-size: 12px;
+  color: #444;
+}
+
+.req-item {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+  gap: 8px;
+}
+
+.req-item.met {
+  color: #10b981;
+}
+
+.req-item.unmet {
+  color: #ef4444;
+}
+
+.req-check {
+  font-weight: bold;
+}
+
 /* Logout button */
 .logout-btn {
   position: fixed;
@@ -640,7 +670,7 @@ button.danger:hover {
     <input id="password" type="password" placeholder="Contraseña">
     <button onclick="login()">Iniciar Sesión</button>
     <div id="loginError"></div>
-    <p style="text-align: center; color: #777777; margin-top: 20px; font-size: 13px;">¿No tienes cuenta? <a href="#" onclick="mostrarRegistro()" style="color: #333333; text-decoration: none; font-weight: 600;">Regístrate aquí</a></p>
+    <p style="text-align: center; color: #777777; margin-top: 20px; font-size: 13px;">¿No tienes cuenta? <a href="#" onclick="mostrarRegistro()" style="color: #333333; text-decoration: none; font-weight: 600;">Registrarse</a></p>
   </div>
 </div>
 
@@ -654,11 +684,17 @@ button.danger:hover {
     <h3 style="text-align: center; margin-bottom: 25px; color: #000000; font-size: 1.3em; font-weight: 600;">Registro de Usuario</h3>
     <input id="regName" placeholder="Nombre completo">
     <input id="regEmail" placeholder="Correo electrónico" type="email">
-    <input id="regPassword" type="password" placeholder="Contraseña">
+    <input id="regPassword" type="password" placeholder="Contraseña" onkeyup="verificarRequisitosContrasena()">
+    <div id="passwordRequirements" class="password-requirements" style="display:none;">
+      <div class="req-item unmet" id="req-length"><span class="req-check">✓</span> Mínimo 8 caracteres</div>
+      <div class="req-item unmet" id="req-number"><span class="req-check">✓</span> Contiene un número</div>
+      <div class="req-item unmet" id="req-special"><span class="req-check">✓</span> Contiene carácter especial (!@#$%^&*)</div>
+      <div class="req-item unmet" id="req-letter"><span class="req-check">✓</span> Contiene una letra</div>
+    </div>
     <input id="regPasswordConfirm" type="password" placeholder="Confirmar contraseña">
     <button onclick="register()">Crear Cuenta</button>
     <div id="regError"></div>
-    <p style="text-align: center; color: #777777; margin-top: 20px; font-size: 13px;">¿Ya tienes cuenta? <a href="#" onclick="mostrarLogin()" style="color: #333333; text-decoration: none; font-weight: 600;">Inicia sesión</a></p>
+    <p style="text-align: center; color: #777777; margin-top: 20px; font-size: 13px;">¿Ya tienes cuenta? <a href="#" onclick="mostrarLogin()" style="color: #333333; text-decoration: none; font-weight: 600;">Iniciar sesión</a></p>
   </div>
 </div>
 
@@ -802,6 +838,32 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// VALIDACIÓN DE REQUISITOS DE CONTRASEÑA
+window.verificarRequisitosContrasena = () => {
+  const pass = document.getElementById("regPassword").value;
+  const requirements = document.getElementById("passwordRequirements");
+  const reqLength = document.getElementById("req-length");
+  const reqNumber = document.getElementById("req-number");
+  const reqSpecial = document.getElementById("req-special");
+  const reqLetter = document.getElementById("req-letter");
+
+  const hasLength = pass.length >= 8;
+  const hasNumber = /\d/.test(pass);
+  const hasSpecial = /[!@#$%^&*]/.test(pass);
+  const hasLetter = /[a-zA-Z]/.test(pass);
+
+  if (pass.length > 0) {
+    requirements.style.display = "block";
+  } else {
+    requirements.style.display = "none";
+  }
+
+  reqLength.className = hasLength ? "req-item met" : "req-item unmet";
+  reqNumber.className = hasNumber ? "req-item met" : "req-item unmet";
+  reqSpecial.className = hasSpecial ? "req-item met" : "req-item unmet";
+  reqLetter.className = hasLetter ? "req-item met" : "req-item unmet";
+};
+
 // LOGIN
 window.login = async () => {
   const email = document.getElementById("email").value.trim();
@@ -842,8 +904,24 @@ window.register = async () => {
     return;
   }
 
-  if (pass.length < 6) {
-    mostrarError("La contraseña debe tener mínimo 6 caracteres");
+  // Validación de contraseña fuerte
+  if (pass.length < 8) {
+    mostrarError("La contraseña debe tener mínimo 8 caracteres");
+    return;
+  }
+
+  if (!/\d/.test(pass)) {
+    mostrarError("La contraseña debe contener al menos un número");
+    return;
+  }
+
+  if (!/[!@#$%^&*]/.test(pass)) {
+    mostrarError("La contraseña debe contener al menos un carácter especial (!@#$%^&*)");
+    return;
+  }
+
+  if (!/[a-zA-Z]/.test(pass)) {
+    mostrarError("La contraseña debe contener al menos una letra");
     return;
   }
 
@@ -898,6 +976,7 @@ onAuthStateChanged(auth, user => {
     document.getElementById("regEmail").value = "";
     document.getElementById("regPassword").value = "";
     document.getElementById("regPasswordConfirm").value = "";
+    document.getElementById("passwordRequirements").style.display = "none";
   }
 });
 
@@ -998,282 +1077,152 @@ window.guardar = async () => {
     return;
   }
 
-  if (!mesa) {
-    mostrarError("Debes indicar la mesa, por ejemplo Mesa 01");
-    return;
-  }
+  const total = cantidad * precio;
+  const imgFile = document.getElementById("imagenVenta").files[0];
+  const imagenBase64 = await leerImagenBase64(imgFile);
 
-  const archivoImagen = document.getElementById('imagenVenta').files[0];
-  const imagenBase64 = await leerImagenBase64(archivoImagen);
-
-  if (!auth.currentUser) {
-    mostrarError("Debes estar logueado para registrar ventas");
-    return;
-  }
+  const venta = {
+    producto,
+    cantidad,
+    precio,
+    total,
+    mesa,
+    metodo,
+    nota,
+    imagen: imagenBase64,
+    fecha: new Date().toLocaleString('es-ES'),
+    timestamp: new Date()
+  };
 
   try {
-    console.log("Intentando guardar en Firestore...");
-
-    const docRef = await addDoc(collection(db, "ventas"), {
-      producto,
-      cantidad: parseFloat(cantidad),
-      precio: parseFloat(precio),
-      mesa,
-      metodo,
-      nota: nota || "",
-      imagen: imagenBase64 || "",
-      total: parseFloat(cantidad) * parseFloat(precio),
-      fecha: new Date().toISOString(),
-      usuario: auth.currentUser.email,
-      timestamp: new Date()
-    });
-
-    console.log("Venta guardada con ID:", docRef.id);
-    mostrarExito("✅ Venta registrada correctamente");
+    const docRef = await addDoc(collection(db, "ventas"), venta);
+    console.log("Documento escrito con ID: ", docRef.id);
+    mostrarExito("✅ Venta registrada exitosamente");
 
     // Limpiar formulario
     document.getElementById("producto").value = "";
-    document.getElementById("cantidad").value = "1";
+    document.getElementById("cantidad").value = 1;
     document.getElementById("precio").value = "";
     document.getElementById("mesa").value = "";
     document.getElementById("nota").value = "";
     document.getElementById("imagenVenta").value = "";
-    document.getElementById('previewContainer').innerHTML = '';
-    document.getElementById('previewContainer').style.display = 'none';
+    document.getElementById("previewContainer").style.display = "none";
+    document.querySelectorAll('.mesa-button').forEach(btn => btn.classList.remove('selected'));
 
-    await cargar();
+    cargar();
   } catch (error) {
-    console.error("Error completo:", error);
-    console.error("Código de error:", error.code);
-    console.error("Mensaje:", error.message);
-
-    let mensajeError = "Error al registrar la venta";
-    if (error.code === "permission-denied") {
-      mensajeError = "No tienes permisos. Verifica las reglas de Firestore.";
-    }
-
-    mostrarError("❌ " + mensajeError);
+    console.error("Error al guardar: ", error);
+    mostrarError("Error al registrar la venta: " + error.message);
   }
 };
 
-// LISTA
-async function cargar() {
-  const lista = document.getElementById("lista");
-  lista.innerHTML = '<div class="loading">Cargando ventas...</div>';
-
-  let total = 0;
-  let cantVentas = 0;
-
+// CARGAR VENTAS
+window.cargar = async () => {
   try {
-    const usuarioActual = auth.currentUser?.email;
-    if (!usuarioActual) {
-      lista.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 20px;">Debes iniciar sesión para ver tus ventas.</p>';
-      actualizarEstadisticas(0, 0);
+    const querySnapshot = await getDocs(collection(db, "ventas"));
+    const lista = document.getElementById("lista");
+    const user = auth.currentUser;
+
+    if (querySnapshot.empty) {
+      lista.innerHTML = '<div class="loading">No hay ventas registradas</div>';
+      document.getElementById("totalVentas").innerText = "S/ 0.00";
+      document.getElementById("cantVentas").innerText = "0";
       return;
     }
 
-    const ventasQuery = query(
-      collection(db, "ventas"),
-      where("usuario", "==", usuarioActual)
-    );
-    const data = await getDocs(ventasQuery);
+    let html = "";
+    let total = 0;
+    const ventas = [];
 
-    if (data.empty) {
-      lista.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 20px;">No hay ventas registradas aún</p>';
-      actualizarEstadisticas(0, 0);
-      return;
-    }
-
-    // Agrupar ventas por fecha y mesa
-    const ventasPorFecha = {};
-
-    data.forEach(d => {
-      const v = d.data();
-      const fechaVenta = v.fecha && v.fecha.toDate ? v.fecha.toDate() : new Date(v.fecha);
-      if (!fechaVenta || isNaN(fechaVenta.getTime())) {
-        console.warn("Venta con fecha inválida, se omite:", d.id, v.fecha);
-        return;
-      }
-      const fechaClave = `${fechaVenta.getFullYear()}-${String(fechaVenta.getMonth() + 1).padStart(2, '0')}-${String(fechaVenta.getDate()).padStart(2, '0')}`;
-      total += v.total || 0;
-      cantVentas++;
-
-      if (!ventasPorFecha[fechaClave]) {
-        ventasPorFecha[fechaClave] = {};
-      }
-      if (!ventasPorFecha[fechaClave][v.mesa]) {
-        ventasPorFecha[fechaClave][v.mesa] = [];
-      }
-      ventasPorFecha[fechaClave][v.mesa].push({ ...v, id: d.id, fecha: fechaVenta.toISOString() });
+    querySnapshot.forEach((doc) => {
+      const venta = doc.data();
+      ventas.push({ ...venta, id: doc.id });
     });
 
-    // Ordenar ventas dentro de cada mesa por fecha
-    for (const fecha in ventasPorFecha) {
-      for (const mesa in ventasPorFecha[fecha]) {
-        ventasPorFecha[fecha][mesa].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-      }
-    }
+    ventas.sort((a, b) => b.timestamp - a.timestamp);
 
-    lista.innerHTML = "";
+    ventas.forEach((venta) => {
+      const imagenHTML = venta.imagen
+        ? `<img src="${venta.imagen}" class="img-expandible" onclick="abrirModal('${venta.imagen.replace(/'/g, "\\'")}')" style="width: 40px; height: 40px; border-radius: 5px; object-fit: cover;">`
+        : "";
 
-    // Ordenar fechas de más reciente a más antigua
-    const fechasOrdenadas = Object.keys(ventasPorFecha).sort((a, b) => new Date(b) - new Date(a));
-
-    fechasOrdenadas.forEach(fecha => {
-      const mesas = ventasPorFecha[fecha];
-      const totalFecha = Object.values(mesas).flat().reduce((sum, v) => sum + v.total, 0);
-      const [year, month, day] = fecha.split('-');
-      const fechaObj = new Date(year, month - 1, day);
-
-      // Encabezado de la fecha
-      lista.innerHTML += `
-        <div class="fecha-block">
-          <div class="fecha-title"><span>📅</span> ${fechaObj.toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
-      `;
-
-      // Ordenar mesas alfabéticamente
-      const mesasOrdenadas = Object.keys(mesas).sort();
-
-      mesasOrdenadas.forEach(mesa => {
-        const ventasMesa = mesas[mesa];
-        const totalMesa = ventasMesa.reduce((sum, v) => sum + v.total, 0);
-
-        // Encabezado de la mesa
-        lista.innerHTML += `
-          <div class="mesa-block" style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ddd;">
-            <h4 style="color: #000000; margin: 0 0 10px 0; font-size: 1.1em; font-weight: 700;">🏷️ ${mesa}</h4>
-        `;
-
-        // Items de la mesa
-        ventasMesa.forEach(v => {
-          const hora = new Date(v.fecha).toLocaleString('es-PE', {
-            hour: '2-digit',
-            minute: '2-digit'
-          });
-
-          lista.innerHTML += `
-            <div class="item-card" style="margin-left: 0; margin-right: 0; margin-bottom: 10px;">
-              <div class="item-info">
-                <strong>${v.producto}</strong> x${v.cantidad}
-                <small>${v.metodo} • ${hora}</small>
-                ${v.nota ? `<br><small style="color: #95a5a6;">Nota: ${v.nota}</small>` : ''}
-                ${v.imagen ? `<br><img src="${v.imagen}" alt="Imagen venta" class="img-expandible" onclick="abrirModal('${v.imagen}')" style="margin-top: 8px; max-width: 120px; border-radius: 10px; border: 1px solid #ccc; cursor: zoom-in;">` : ''}
-              </div>
-              <div class="item-total">S/ ${v.total.toFixed(2)}</div>
-              <button class="danger" onclick="eliminar('${v.id}')" style="padding: 8px 12px; font-size: 12px;">🗑️</button>
-            </div>
-          `;
-        });
-
-        // Total de la mesa
-        lista.innerHTML += `
-            <div style="text-align: right; padding: 10px 0; border-top: 1px solid #ddd; margin-top: 10px; font-weight: 700; color: #000000;">
-              Total ${mesa}: S/ ${totalMesa.toFixed(2)}
-            </div>
+      html += `
+        <div class="item-card">
+          <div class="item-info">
+            <strong>${venta.producto}</strong>
+            <small>${venta.cantidad}x S/ ${venta.precio.toFixed(2)} | ${venta.mesa} | ${venta.metodo} | ${venta.fecha}</small>
           </div>
-        `;
-      });
-
-      // Total de la fecha
-      lista.innerHTML += `
-          <div style="text-align: right; padding: 15px 0; border-top: 2px solid #333; margin-top: 15px; font-weight: 700; color: #000000; font-size: 1.1em;">
-            Total del día: S/ ${totalFecha.toFixed(2)}
-          </div>
+          ${imagenHTML}
+          <div class="item-total">S/ ${venta.total.toFixed(2)}</div>
+          <button onclick="eliminar('${venta.id}')" class="danger" style="padding: 8px 15px; font-size: 12px; width: auto;">🗑️ Eliminar</button>
         </div>
       `;
+      total += venta.total;
     });
 
-    actualizarEstadisticas(total, cantVentas);
+    lista.innerHTML = html;
+    document.getElementById("totalVentas").innerText = "S/ " + total.toFixed(2);
+    document.getElementById("cantVentas").innerText = ventas.length;
   } catch (error) {
-    console.error("Error al cargar ventas:", error);
-    lista.innerHTML = '<p style="color: #e74c3c; text-align: center; padding: 20px;">Error al cargar las ventas</p>';
+    console.error("Error al cargar: ", error);
+    mostrarError("Error al cargar las ventas");
   }
-}
-
-// FUNCIONES DE MENSAJES
-function mostrarError(mensaje) {
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'error';
-  errorDiv.innerHTML = mensaje;
-  errorDiv.style.position = 'fixed';
-  errorDiv.style.top = '20px';
-  errorDiv.style.left = '50%';
-  errorDiv.style.transform = 'translateX(-50%)';
-  errorDiv.style.zIndex = '10000';
-  errorDiv.style.maxWidth = '90%';
-  errorDiv.style.width = 'auto';
-
-  document.body.appendChild(errorDiv);
-  setTimeout(() => errorDiv.remove(), 4000);
-}
-
-function mostrarExito(mensaje) {
-  const exitoDiv = document.createElement('div');
-  exitoDiv.className = 'success';
-  exitoDiv.innerHTML = mensaje;
-  exitoDiv.style.position = 'fixed';
-  exitoDiv.style.top = '20px';
-  exitoDiv.style.left = '50%';
-  exitoDiv.style.transform = 'translateX(-50%)';
-  exitoDiv.style.zIndex = '10000';
-  exitoDiv.style.maxWidth = '90%';
-  exitoDiv.style.width = 'auto';
-
-  document.body.appendChild(exitoDiv);
-  setTimeout(() => exitoDiv.remove(), 3000);
-}
-
-// ACTUALIZAR ESTADÍSTICAS
-function actualizarEstadisticas(total, cantidad) {
-  document.getElementById("totalVentas").innerText = "S/ " + total.toFixed(2);
-  document.getElementById("cantVentas").innerText = cantidad;
-}
+};
 
 // ELIMINAR
 window.eliminar = async (id) => {
-  if (!confirm("¿Estás seguro de que deseas eliminar esta venta?")) {
-    return;
-  }
-
-  try {
-    await deleteDoc(doc(db, "ventas", id));
-    mostrarExito("✅ Venta eliminada correctamente");
-    await cargar();
-  } catch (error) {
-    console.error("Error al eliminar:", error);
-    mostrarError("❌ Error al eliminar la venta");
+  if (confirm("¿Estás seguro de que deseas eliminar esta venta?")) {
+    try {
+      await deleteDoc(doc(db, "ventas", id));
+      mostrarExito("Venta eliminada");
+      cargar();
+    } catch (error) {
+      console.error("Error al eliminar: ", error);
+      mostrarError("Error al eliminar la venta");
+    }
   }
 };
-let deferredInstallPrompt = null;
-window.installApp = async () => {
-  if (!deferredInstallPrompt) return;
-  deferredInstallPrompt.prompt();
-  const choiceResult = await deferredInstallPrompt.userChoice;
-  deferredInstallPrompt = null;
-  document.getElementById('installBtn').style.display = 'none';
-  console.log('PWA install choice:', choiceResult.outcome);
+
+// MOSTRAR ERRORES Y ÉXITOS
+window.mostrarError = (mensaje) => {
+  const errorDiv = document.getElementById("loginError") || document.getElementById("regError");
+  if (errorDiv) {
+    errorDiv.innerHTML = `<div class="error">${mensaje}</div>`;
+    setTimeout(() => {
+      errorDiv.innerHTML = "";
+    }, 4000);
+  }
 };
 
-window.addEventListener('beforeinstallprompt', (event) => {
-  event.preventDefault();
-  deferredInstallPrompt = event;
-  const installButton = document.getElementById('installBtn');
-  if (installButton) {
-    installButton.style.display = 'block';
-    installButton.onclick = window.installApp;
+window.mostrarExito = (mensaje) => {
+  const loginDiv = document.getElementById("loginDiv");
+  const regDiv = document.getElementById("registerDiv");
+  let container = loginDiv.style.display !== "none" ? loginDiv : regDiv;
+
+  if (container.style.display === "none") {
+    container = document.getElementById("appDiv");
   }
+
+  const mensaje_div = document.createElement("div");
+  mensaje_div.className = "success";
+  mensaje_div.innerText = mensaje;
+  container.insertBefore(mensaje_div, container.firstChild);
+
+  setTimeout(() => {
+    mensaje_div.remove();
+  }, 3000);
+};
+
+// PWA - INSTALL
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  const installBtn = document.getElementById("installBtn");
+  installBtn.style.display = "block";
+  installBtn.addEventListener("click", () => {
+    e.prompt();
+  });
 });
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', async () => {
-    try {
-      await navigator.serviceWorker.register('service-worker.js');
-      console.log('Service worker registered');
-    } catch (error) {
-      console.error('Service worker registration failed:', error);
-    }
-  });
-}
 </script>
 
 </body>
